@@ -41,12 +41,17 @@ public class SpringSecurityConfig {
 						"/swagger-resources/**",
 						"/webjars/**"
 					).permitAll()
-				.requestMatchers(HttpMethod.GET, "/api/users").permitAll()
-				.requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+					.requestMatchers(HttpMethod.GET, "/api/users").permitAll()
+					.requestMatchers(HttpMethod.GET, "/api/users/{id}").hasRole("ADMIN")
+					.requestMatchers(HttpMethod.POST, "/api/users/register").hasRole("ADMIN")
+					.requestMatchers(HttpMethod.PUT, "/api/users/{id}").hasRole("ADMIN")
+					.requestMatchers(HttpMethod.DELETE, "/api/users/{id}").hasRole("ADMIN")
 						.anyRequest().authenticated())
-			.csrf(c -> c.disable())
-			.sessionManagement(management -> management
-					.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+					.addFilter(new JwtAuthenticationFilter(authenticationManager()))
+					.addFilter(new JwtValidationFilter(authenticationManager()))
+					.csrf(c -> c.disable())
+					.sessionManagement(management -> management
+							.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.build();
 	}
 }

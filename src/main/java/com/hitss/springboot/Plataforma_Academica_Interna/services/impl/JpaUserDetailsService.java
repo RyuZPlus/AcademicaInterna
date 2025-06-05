@@ -26,16 +26,14 @@ public class JpaUserDetailsService implements UserDetailsService{
 			throws UsernameNotFoundException {
 		Optional<User> userOptional = userRepository.findByUsername(username);
 		
-		//"Username " + username + " no existe en el sistema!"
-		if(userOptional.isEmpty()) {
-			throw new UsernameNotFoundException(
-					String.format("Username %s no existe en el sistema!", username)
-					);
-		}
-		User user = userOptional.orElseThrow();
-		List<GrantedAuthority> authorities = user.getRole().stream()
-				.map(role -> new SimpleGrantedAuthority(role.getName()))
-				.collect(Collectors.toList());
+		User user = userOptional.orElseThrow(() ->
+	    new UsernameNotFoundException(String.format("Username %s no existe en el sistema!", username))
+	);
+		
+		List<GrantedAuthority> authorities = List.of(
+		        new SimpleGrantedAuthority(user.getRole().getName())
+		    );
+		
 		return new org.springframework.security.core.userdetails.User(
 				user.getUsername(), 
 				user.getPassword(), 

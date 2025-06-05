@@ -31,14 +31,37 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public User save(User user) {
-		List<Role> roles = new ArrayList<>();
-		for (Role incomingRole : user.getRole()) {
-	        roleRepository.findByName(incomingRole.getName()).ifPresent(roles::add);
-	    }
-		user.setRole(roles);
-		
+		Role role = roleRepository.findByName(user.getRole().getName()).orElse(null);
+		user.setRole(role);
+
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		return userRepository.save(user);
+
+	}
+
+	@Override
+	public User findByUsername(String username) {
+		return userRepository.findByUsername(username).orElse(null);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public User findById(Long id) {
+		return userRepository.findById(id).orElse(null);
+	}
+
+	@Override
+	public User update(User user) {
+		Role role = roleRepository.findByName(user.getRole().getName()).orElse(null);
+		user.setRole(role);
+
+		user.setPassword(passwordEncoder.encode(user.getPassword()));
+		return userRepository.save(user);
+	}
+
+	@Override
+	public void deleteById(Long id) {
+		userRepository.deleteById(id);
 	}
 
 }
