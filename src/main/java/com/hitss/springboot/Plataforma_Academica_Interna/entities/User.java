@@ -1,7 +1,5 @@
 package com.hitss.springboot.Plataforma_Academica_Interna.entities;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;

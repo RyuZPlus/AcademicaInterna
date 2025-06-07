@@ -41,11 +41,29 @@ public class SpringSecurityConfig {
 						"/swagger-resources/**",
 						"/webjars/**"
 					).permitAll()
-					.requestMatchers(HttpMethod.GET, "/api/users").permitAll()
-					.requestMatchers(HttpMethod.GET, "/api/users/{id}").hasRole("ADMIN")
-					.requestMatchers(HttpMethod.POST, "/api/users/register").hasRole("ADMIN")
+					.requestMatchers(HttpMethod.GET, "/api/users", "/api/teachers", "/api/students", "/api/users/me").permitAll()
+					.requestMatchers(HttpMethod.GET, "/api/teachers/{id}/asignaturas",
+							"/api/subjects", 
+							"/api/subjects/{id}", 
+							"/api/period").hasAnyRole("ADMIN","TEACHER")
+					.requestMatchers(HttpMethod.GET, "/api/students/{id}/grades",
+							"/api/courses", 
+							"/api/courses/{id}", 
+							"/api/period/{id}", 
+							"/api/grade/subject/{id}",
+							"/api/grade/student/{id}").hasAnyRole("ADMIN","STUDENT")
+					.requestMatchers(HttpMethod.GET, "/api/users/{id}", "/api/teachers/{id}", "/api/students/{id}").hasRole("ADMIN")
+					.requestMatchers(HttpMethod.POST, "/api/users/register", 
+							"/api/teachers", 
+							"/api/students", 
+							"/api/subjects", 
+							"/api/courses", 
+							"/api/period").hasRole("ADMIN")
+					.requestMatchers(HttpMethod.POST, "/api/grade").hasRole("TEACHER")
 					.requestMatchers(HttpMethod.PUT, "/api/users/{id}").hasRole("ADMIN")
+					.requestMatchers(HttpMethod.PUT, "/api/subjects/{id}", "/api/grade").hasRole("TEACHER")
 					.requestMatchers(HttpMethod.DELETE, "/api/users/{id}").hasRole("ADMIN")
+					.requestMatchers(HttpMethod.DELETE, "/api/subjects/{id}", "/api/grade").hasRole("TEACHER")
 						.anyRequest().authenticated())
 					.addFilter(new JwtAuthenticationFilter(authenticationManager()))
 					.addFilter(new JwtValidationFilter(authenticationManager()))

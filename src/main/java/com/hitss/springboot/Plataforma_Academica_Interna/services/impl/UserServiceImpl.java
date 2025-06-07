@@ -1,6 +1,5 @@
 package com.hitss.springboot.Plataforma_Academica_Interna.services.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
