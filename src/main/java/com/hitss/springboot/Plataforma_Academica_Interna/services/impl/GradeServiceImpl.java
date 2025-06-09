@@ -9,18 +9,22 @@ import com.hitss.springboot.Plataforma_Academica_Interna.entities.Grade;
 import com.hitss.springboot.Plataforma_Academica_Interna.entities.SchoolPeriod;
 import com.hitss.springboot.Plataforma_Academica_Interna.entities.Student;
 import com.hitss.springboot.Plataforma_Academica_Interna.entities.Subject;
+import com.hitss.springboot.Plataforma_Academica_Interna.entities.User;
 import com.hitss.springboot.Plataforma_Academica_Interna.entities.dtos.GradeRequestDTO;
 import com.hitss.springboot.Plataforma_Academica_Interna.entities.keys.GradeId;
 import com.hitss.springboot.Plataforma_Academica_Interna.repositories.GradeRepository;
 import com.hitss.springboot.Plataforma_Academica_Interna.repositories.SchoolPeriodRepository;
 import com.hitss.springboot.Plataforma_Academica_Interna.repositories.StudentRepository;
 import com.hitss.springboot.Plataforma_Academica_Interna.repositories.SubjectRepository;
+import com.hitss.springboot.Plataforma_Academica_Interna.repositories.UserRepository;
 import com.hitss.springboot.Plataforma_Academica_Interna.services.GradeService;
 
 @Service
 public class GradeServiceImpl implements GradeService{
 	@Autowired
     private GradeRepository gradeRepository;
+	@Autowired
+    private UserRepository userRepository;
 	@Autowired
 	private StudentRepository studentRepository;
 	@Autowired
@@ -52,7 +56,7 @@ public class GradeServiceImpl implements GradeService{
 	public List<Grade> getGradesByStudent(Long studentId) {
 		Student student = studentRepository.findById(studentId)
 		        .orElseThrow(() -> new RuntimeException("Estudiante no encontrado con ID: " + studentId));
-		    return gradeRepository.findByStudentId(student);
+		    return gradeRepository.findByStudent(student);
 	}
 
 	@Override
@@ -72,4 +76,34 @@ public class GradeServiceImpl implements GradeService{
 	public void deleteGrade(GradeId id) {
 		gradeRepository.deleteById(id);
 	}
+	
+	@Override
+    public boolean canAccessGrades(String username, Long studentId) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (user.getRole().getName().equals("ROLE_ADMIN")) return true;
+
+        if (user.getRole().getName().equals("ROLE_STUDENT")) {
+            Long userStudentId = studentRepository.findByUserId(user.getId())
+                    .map(Student::getId)
+                    .orElse(null);
+            return studentId.equals(userStudentId);
+        }
+
+        if (user.getRole().getName().equals("ROLE_TEACHER")) {
+            List<Grade> grades = gradeRepository.findByStudent(
+                studentRepository.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("Estudiante no encontrado"))
+            );
+
+            for (Grade grade : grades) {
+                if (grade.getSubject().getTeacher().getUser().getId().equals(user.getId())) {
+                    return true;
+                }
+            }
+        }
+
+        return false; 
+    }
 }

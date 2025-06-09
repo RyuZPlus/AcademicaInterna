@@ -12,4 +12,5 @@ public interface GradeService {
     List<Grade> getGradesByStudent(Long studentId);
     Grade updateGrade(GradeRequestDTO dto);
     void deleteGrade(GradeId id);
+    boolean canAccessGrades(String username, Long studentId);
 }

@@ -11,10 +11,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
 
 import com.hitss.springboot.Plataforma_Academica_Interna.entities.Grade;
 import com.hitss.springboot.Plataforma_Academica_Interna.entities.Student;
 import com.hitss.springboot.Plataforma_Academica_Interna.entities.dtos.StudentRequestDTO;
+import com.hitss.springboot.Plataforma_Academica_Interna.services.GradeService;
 import com.hitss.springboot.Plataforma_Academica_Interna.services.StudentService;
 
 @RestController
@@ -22,6 +24,8 @@ import com.hitss.springboot.Plataforma_Academica_Interna.services.StudentService
 public class StudentController {
 	@Autowired
     private StudentService studentService;
+	@Autowired
+	private GradeService gradeService;
 
     @PostMapping
     public ResponseEntity<Student> createStudent(@RequestBody StudentRequestDTO dto) {
@@ -42,7 +46,13 @@ public class StudentController {
     }
 
     @GetMapping("/{id}/grades")
-    public ResponseEntity<?> getGradesByStudentId(@PathVariable Long id) {
+    public ResponseEntity<?> getGradesByStudentId(@PathVariable Long id, Authentication authentication) {
+        String username = authentication.getName();
+
+        if (!gradeService.canAccessGrades(username, id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado");
+        }
+
         List<Grade> grades = studentService.getGradesByStudentId(id);
         return ResponseEntity.ok(grades);
     }

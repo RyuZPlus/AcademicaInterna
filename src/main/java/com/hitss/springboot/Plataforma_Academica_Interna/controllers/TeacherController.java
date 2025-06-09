@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hitss.springboot.Plataforma_Academica_Interna.entities.Teacher;
+import com.hitss.springboot.Plataforma_Academica_Interna.entities.dtos.TeacherRequestDTO;
 import com.hitss.springboot.Plataforma_Academica_Interna.services.TeacherService;
 import com.hitss.springboot.Plataforma_Academica_Interna.services.UserService;
 
@@ -23,7 +24,7 @@ public class TeacherController {
 	private UserService userService;
 
     @PostMapping
-    public ResponseEntity<?> createTeacher(@RequestBody Teacher teacher) {
+    public ResponseEntity<?> createTeacher(@RequestBody TeacherRequestDTO teacher) {
         Teacher created = teacherService.createTeacher(teacher);
         return ResponseEntity.ok(created);
     }

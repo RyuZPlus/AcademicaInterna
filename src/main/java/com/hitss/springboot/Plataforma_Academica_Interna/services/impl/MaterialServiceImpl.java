@@ -7,6 +7,8 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,13 +33,11 @@ public class MaterialServiceImpl implements MaterialService {
     @Autowired
     private TeacherRepository teacherRepository;
 
-	@Override
-	public Material uploadMaterial(String title, String description, Long subjectId, Long teacherId,
-			MultipartFile file) {
-		try {
+    @Override
+    public Material uploadMaterial(String title, String description, Long subjectId, MultipartFile file) {
+        try {
             if (file.isEmpty()) throw new RuntimeException("Archivo vacío.");
 
-            // Guardar el archivo físicamente
             String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
             Path path = Paths.get(UPLOAD_DIR + fileName);
             Files.createDirectories(path.getParent());
@@ -45,8 +45,22 @@ public class MaterialServiceImpl implements MaterialService {
 
             Subject subject = subjectRepository.findById(subjectId)
                 .orElseThrow(() -> new RuntimeException("Asignatura no encontrada"));
-            Teacher teacher = teacherRepository.findById(teacherId)
+
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+            String username;
+            if (principal instanceof UserDetails) {
+                username = ((UserDetails) principal).getUsername();
+            } else {
+                username = principal.toString();
+            }
+
+            Teacher teacher = teacherRepository.findByUserUsername(username)
                 .orElseThrow(() -> new RuntimeException("Profesor no encontrado"));
+
+            if (!subject.getTeacher().getId().equals(teacher.getId())) {
+                throw new RuntimeException("No puedes subir materiales para esta asignatura.");
+            }
 
             Material material = new Material();
             material.setTitle(title);
@@ -60,7 +74,9 @@ public class MaterialServiceImpl implements MaterialService {
         } catch (IOException e) {
             throw new RuntimeException("Error al guardar archivo", e);
         }
-	}
+    }
+
+
 
 	@Override
 	public List<Material> getMaterialsBySubjectId(Long subjectId) {

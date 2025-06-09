@@ -9,6 +9,6 @@ import com.hitss.springboot.Plataforma_Academica_Interna.entities.Student;
 import com.hitss.springboot.Plataforma_Academica_Interna.entities.keys.GradeId;
 
 public interface GradeRepository extends JpaRepository<Grade, GradeId>{
-	List<Grade> findByStudentId(Student student);
+	List<Grade> findByStudent(Student student);
 	List<Grade> findBySubjectId(Long subjectId);
 }
