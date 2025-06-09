@@ -3,10 +3,11 @@ package com.hitss.springboot.Plataforma_Academica_Interna.services.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import com.hitss.springboot.Plataforma_Academica_Interna.entities.Subject;
 import com.hitss.springboot.Plataforma_Academica_Interna.entities.Teacher;
+import com.hitss.springboot.Plataforma_Academica_Interna.entities.dtos.SubjectByTeacherDTO;
 import com.hitss.springboot.Plataforma_Academica_Interna.repositories.TeacherRepository;
 import com.hitss.springboot.Plataforma_Academica_Interna.services.TeacherService;
 
@@ -32,9 +33,21 @@ public class TeacherServiceImpl implements TeacherService {
 	}
 
 	@Override
-	public List<Subject> getSubjectsByTeacherId(Long id) {
-		Teacher teacher = getTeacherById(id);
-        return teacher.getSubjects(); 
+	public List<SubjectByTeacherDTO> getSubjectsByTeacherId(Long teacherId, Long currentUserId) {
+		Teacher teacher = getTeacherById(teacherId);
+	    
+	    if (!teacher.getUser().getId().equals(currentUserId)) {
+	        throw new AccessDeniedException("No tienes acceso a estas asignaturas.");
+	    }
+
+	    return teacher.getSubjects().stream()
+	    		.map(subject -> new SubjectByTeacherDTO(
+	    			    subject.getId(),
+	    			    subject.getName(),
+	    			    subject.getCourse().getName(),
+	    			    subject.getCourse().getAcademicYear()
+	    			))
+	        .toList();
 	}
 
 }

@@ -42,16 +42,20 @@ public class SpringSecurityConfig {
 						"/webjars/**"
 					).permitAll()
 					.requestMatchers(HttpMethod.GET, "/api/users", "/api/teachers", "/api/students", "/api/users/me").permitAll()
-					.requestMatchers(HttpMethod.GET, "/api/teachers/{id}/asignaturas",
+					.requestMatchers(HttpMethod.GET, "/api/teachers/{id}/subjects",
 							"/api/subjects", 
 							"/api/subjects/{id}", 
-							"/api/period").hasAnyRole("ADMIN","TEACHER")
+							"/api/period",
+							"/api/reports/grades-average",
+							"/api/reports/final-report/{id}").hasAnyRole("ADMIN","TEACHER")
 					.requestMatchers(HttpMethod.GET, "/api/students/{id}/grades",
 							"/api/courses", 
 							"/api/courses/{id}", 
 							"/api/period/{id}", 
 							"/api/grade/subject/{id}",
-							"/api/grade/student/{id}").hasAnyRole("ADMIN","STUDENT")
+							"/api/grade/student/{id}",
+							"/api/reports/student-history/{id}").hasAnyRole("ADMIN","STUDENT")
+					.requestMatchers(HttpMethod.GET, "/api/materials/subject/{id}").hasRole("STUDENT")
 					.requestMatchers(HttpMethod.GET, "/api/users/{id}", "/api/teachers/{id}", "/api/students/{id}").hasRole("ADMIN")
 					.requestMatchers(HttpMethod.POST, "/api/users/register", 
 							"/api/teachers", 
@@ -59,11 +63,11 @@ public class SpringSecurityConfig {
 							"/api/subjects", 
 							"/api/courses", 
 							"/api/period").hasRole("ADMIN")
-					.requestMatchers(HttpMethod.POST, "/api/grade").hasRole("TEACHER")
+					.requestMatchers(HttpMethod.POST, "/api/grade", "/api/materials").hasRole("TEACHER")
 					.requestMatchers(HttpMethod.PUT, "/api/users/{id}").hasRole("ADMIN")
 					.requestMatchers(HttpMethod.PUT, "/api/subjects/{id}", "/api/grade").hasRole("TEACHER")
 					.requestMatchers(HttpMethod.DELETE, "/api/users/{id}").hasRole("ADMIN")
-					.requestMatchers(HttpMethod.DELETE, "/api/subjects/{id}", "/api/grade").hasRole("TEACHER")
+					.requestMatchers(HttpMethod.DELETE, "/api/subjects/{id}", "/api/grade", "/api/materials/{id}").hasRole("TEACHER")
 						.anyRequest().authenticated())
 					.addFilter(new JwtAuthenticationFilter(authenticationManager()))
 					.addFilter(new JwtValidationFilter(authenticationManager()))

@@ -3,6 +3,7 @@ package com.hitss.springboot.Plataforma_Academica_Interna.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hitss.springboot.Plataforma_Academica_Interna.entities.Grade;
 import com.hitss.springboot.Plataforma_Academica_Interna.entities.Student;
+import com.hitss.springboot.Plataforma_Academica_Interna.entities.dtos.StudentRequestDTO;
 import com.hitss.springboot.Plataforma_Academica_Interna.services.StudentService;
 
 @RestController
@@ -22,9 +24,9 @@ public class StudentController {
     private StudentService studentService;
 
     @PostMapping
-    public ResponseEntity<?> createStudent(@RequestBody Student student) {
-        Student createdStudent = studentService.createStudent(student);
-        return ResponseEntity.ok(createdStudent);
+    public ResponseEntity<Student> createStudent(@RequestBody StudentRequestDTO dto) {
+        Student createdStudent = studentService.createStudent(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdStudent);
     }
 
     @GetMapping

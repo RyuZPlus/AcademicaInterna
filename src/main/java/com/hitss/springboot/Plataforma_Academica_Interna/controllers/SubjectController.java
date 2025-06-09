@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hitss.springboot.Plataforma_Academica_Interna.entities.Subject;
+import com.hitss.springboot.Plataforma_Academica_Interna.entities.dtos.SubjectRequestDTO;
 import com.hitss.springboot.Plataforma_Academica_Interna.services.SubjectService;
 
 @RestController
@@ -21,10 +22,10 @@ public class SubjectController {
     private SubjectService subjectService;
 
     @PostMapping
-    public ResponseEntity<?> createSubject(@RequestBody Subject subject) {
-        return ResponseEntity.ok(subjectService.createSubject(subject));
+    public ResponseEntity<?> createSubject(@RequestBody SubjectRequestDTO dto) {
+        return ResponseEntity.ok(subjectService.createSubject(dto));
     }
-
+    
     @GetMapping
     public ResponseEntity<?> getAllSubjects() {
         return ResponseEntity.ok(subjectService.getAllSubjects());

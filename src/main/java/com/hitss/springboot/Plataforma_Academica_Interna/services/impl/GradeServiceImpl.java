@@ -6,10 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.hitss.springboot.Plataforma_Academica_Interna.entities.Grade;
+import com.hitss.springboot.Plataforma_Academica_Interna.entities.SchoolPeriod;
 import com.hitss.springboot.Plataforma_Academica_Interna.entities.Student;
+import com.hitss.springboot.Plataforma_Academica_Interna.entities.Subject;
+import com.hitss.springboot.Plataforma_Academica_Interna.entities.dtos.GradeRequestDTO;
 import com.hitss.springboot.Plataforma_Academica_Interna.entities.keys.GradeId;
 import com.hitss.springboot.Plataforma_Academica_Interna.repositories.GradeRepository;
+import com.hitss.springboot.Plataforma_Academica_Interna.repositories.SchoolPeriodRepository;
 import com.hitss.springboot.Plataforma_Academica_Interna.repositories.StudentRepository;
+import com.hitss.springboot.Plataforma_Academica_Interna.repositories.SubjectRepository;
 import com.hitss.springboot.Plataforma_Academica_Interna.services.GradeService;
 
 @Service
@@ -18,10 +23,24 @@ public class GradeServiceImpl implements GradeService{
     private GradeRepository gradeRepository;
 	@Autowired
 	private StudentRepository studentRepository;
+	@Autowired
+	private SubjectRepository subjectRepository;
+	@Autowired
+	private SchoolPeriodRepository schoolPeriodRepository;
 
 	@Override
-	public Grade saveGrade(Grade grade) {
-		return gradeRepository.save(grade);
+	public Grade saveGrade(GradeRequestDTO dto) {
+		Student student = studentRepository.findById(dto.getStudentId())
+		        .orElseThrow(() -> new RuntimeException("Estudiante no encontrado"));
+
+		    Subject subject = subjectRepository.findById(dto.getSubjectId())
+		        .orElseThrow(() -> new RuntimeException("Asignatura no encontrada"));
+
+		    SchoolPeriod schoolPeriod = schoolPeriodRepository.findById(dto.getSchoolPeriodId())
+		        .orElseThrow(() -> new RuntimeException("Periodo escolar no encontrado"));
+
+		    Grade grade = new Grade(student, subject, schoolPeriod, dto.getGrade(), dto.getObservations());
+		    return gradeRepository.save(grade);
 	}
 
 	@Override
@@ -37,11 +56,15 @@ public class GradeServiceImpl implements GradeService{
 	}
 
 	@Override
-	public Grade updateGrade(GradeId id, Grade grade) {
-		Grade existing = gradeRepository.findById(id).orElseThrow(() ->
-        new RuntimeException("Calificación no encontrada."));
-	    existing.setGrade(grade.getGrade());
-	    existing.setObservations(grade.getObservations());
+	public Grade updateGrade(GradeRequestDTO dto) {
+		GradeId id = new GradeId(dto.getStudentId(), dto.getSubjectId(), dto.getSchoolPeriodId());
+
+	    Grade existing = gradeRepository.findById(id).orElseThrow(() ->
+	        new RuntimeException("Calificación no encontrada."));
+
+	    existing.setGrade(dto.getGrade());
+	    existing.setObservations(dto.getObservations());
+
 	    return gradeRepository.save(existing);
 	}
 

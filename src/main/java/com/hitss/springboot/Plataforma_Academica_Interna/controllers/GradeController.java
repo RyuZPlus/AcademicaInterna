@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hitss.springboot.Plataforma_Academica_Interna.entities.Grade;
+import com.hitss.springboot.Plataforma_Academica_Interna.entities.dtos.GradeRequestDTO;
 import com.hitss.springboot.Plataforma_Academica_Interna.entities.keys.GradeId;
 import com.hitss.springboot.Plataforma_Academica_Interna.services.GradeService;
 
@@ -22,8 +23,8 @@ public class GradeController {
     private GradeService gradeService;
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody Grade grade) {
-        return ResponseEntity.ok(gradeService.saveGrade(grade));
+    public ResponseEntity<?> create(@RequestBody GradeRequestDTO gradeDto) {
+        return ResponseEntity.ok(gradeService.saveGrade(gradeDto));
     }
 
     @GetMapping("/subject/{id}")
@@ -37,13 +38,8 @@ public class GradeController {
     }
 
     @PutMapping
-    public ResponseEntity<Grade> update(@RequestBody Grade grade) {
-        GradeId id = new GradeId(
-            grade.getStudent().getId(),
-            grade.getSubject().getId(),
-            grade.getSchoolPeriod().getId()
-        );
-        return ResponseEntity.ok(gradeService.updateGrade(id, grade));
+    public ResponseEntity<?> update(@RequestBody GradeRequestDTO grade) {
+    	return ResponseEntity.ok(gradeService.updateGrade(grade));
     }
 
     @DeleteMapping
