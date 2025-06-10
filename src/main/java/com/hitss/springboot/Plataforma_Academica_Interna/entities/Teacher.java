@@ -33,7 +33,7 @@ public class Teacher {
 
     private String specialty;
     
-    @OneToMany(mappedBy = "teacher", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "teacher", fetch = FetchType.LAZY) //<- LAZY Sería en caso que quiera cargar las materias al profesor
     @JsonIgnore
     private List<Subject> subjects;
 }

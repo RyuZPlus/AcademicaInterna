@@ -82,6 +82,9 @@ public class SpringSecurityConfig {
 							"/api/courses", 
 							"/api/period")
 					.hasRole("ADMIN")
+					.requestMatchers(HttpMethod.POST,
+							"/api/users/login")
+					.permitAll()
 					.requestMatchers(HttpMethod.POST, 
 							"/api/grade", 
 							"/api/materials")
